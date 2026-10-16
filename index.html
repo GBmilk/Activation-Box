@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="forest" data-mode="day">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>激活盒子 · 密钥解析工具</title>
+  <meta name="description" content="激活盒子 —— 粘贴激活密钥，一键解析并自动复制激活内容。全部在本机浏览器内完成。" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='4' width='24' height='24' rx='7' fill='%231fae6a'/%3E%3Cpath d='M16 9v14M9 16h14' stroke='white' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <!-- 主题预热：在首屏绘制之前把已保存的主题色与明暗模式写到 <html> 上，消除闪烁 -->
+  <script src="js/theme-init.js"></script>
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 背景层：底色由 body 承担，光晕与色球负责氛围 -->
+  <div class="backdrop" aria-hidden="true">
+    <span class="backdrop__wash"></span>
+    <span class="orb orb--a"></span>
+    <span class="orb orb--b"></span>
+    <span class="orb orb--c"></span>
+  </div>
+
+  <div class="page">
+    <!-- ============ 顶部标题 ============ -->
+    <header class="hero">
+      <div class="hero__top">
+
+        <div class="brand">
+          <div class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" width="26" height="26">
+              <path d="M16 5v22M5 16h22" stroke="currentColor" stroke-width="3.2"
+                    stroke-linecap="round" fill="none" />
+            </svg>
+          </div>
+          <div class="brand__text">
+            <h1 class="brand__title">激活盒子</h1>
+            <p class="brand__sub">密钥解析工具</p>
+          </div>
+        </div>
+
+        <!-- 外观设置：主题颜色 × 明暗模式，两条独立的轴 -->
+        <div class="switchers">
+
+          <!-- 轴一：主题颜色 -->
+          <div class="seg" id="themeSwitch" role="radiogroup" aria-label="主题颜色">
+            <span class="seg__glider" id="themeGlider" aria-hidden="true"></span>
+
+            <button type="button" class="seg__opt" role="radio"
+                    aria-checked="true" tabindex="0" data-value="forest">
+              <span class="seg__dot" data-swatch="forest" aria-hidden="true"></span>
+              <span class="seg__label">森林绿</span>
+            </button>
+
+            <button type="button" class="seg__opt" role="radio"
+                    aria-checked="false" tabindex="-1" data-value="violet">
+              <span class="seg__dot" data-swatch="violet" aria-hidden="true"></span>
+              <span class="seg__label">紫光蓝</span>
+            </button>
+
+            <button type="button" class="seg__opt" role="radio"
+                    aria-checked="false" tabindex="-1" data-value="amber">
+              <span class="seg__dot" data-swatch="amber" aria-hidden="true"></span>
+              <span class="seg__label">橙渐白</span>
+            </button>
+          </div>
+
+          <!-- 轴二：明暗模式 -->
+          <div class="seg seg--mode" id="modeSwitch" role="radiogroup" aria-label="明暗模式">
+            <span class="seg__glider" id="modeGlider" aria-hidden="true"></span>
+
+            <button type="button" class="seg__opt" role="radio"
+                    aria-checked="true" tabindex="0" data-value="day">
+              <span class="seg__icon" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="13" height="13" fill="none"
+                     stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <circle cx="8" cy="8" r="3.1" />
+                  <path d="M8 1.3v1.7M8 13v1.7M1.3 8h1.7M13 8h1.7M3.3 3.3l1.2 1.2M11.5 11.5l1.2 1.2M12.7 3.3l-1.2 1.2M4.5 11.5l-1.2 1.2" />
+                </svg>
+              </span>
+              <span class="seg__label">白天</span>
+            </button>
+
+            <button type="button" class="seg__opt" role="radio"
+                    aria-checked="false" tabindex="-1" data-value="night">
+              <span class="seg__icon" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="13" height="13" fill="none"
+                     stroke="currentColor" stroke-width="1.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M13.3 9.7A5.7 5.7 0 0 1 6.3 2.7a5.7 5.7 0 1 0 7 7Z" />
+                </svg>
+              </span>
+              <span class="seg__label">黑夜</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <p class="hero__desc">
+        把你的<strong>激活密钥</strong>投放进盒子，启动激活程序，
+        盒子会为你解析出完整的激活内容，并顺手复制到剪贴板。
+      </p>
+    </header>
+
+    <!-- ============ 主面板 ============ -->
+    <main class="panel" role="main">
+
+      <!-- 输入区 -->
+      <section class="field">
+        <div class="field__head">
+          <label class="field__label" for="inputBox">
+            <span class="field__step">01</span>
+            <span class="field__name">输入激活密钥</span>
+          </label>
+          <div class="field__tools">
+            <button type="button" class="btn btn--link" id="clearBtn">清空</button>
+          </div>
+        </div>
+
+        <div class="box box--input">
+          <textarea id="inputBox" class="box__area"
+                    placeholder="在此粘贴你的激活密钥……&#10;（可包含换行与空格，盒子会自动整理）"
+                    spellcheck="false" autocomplete="off" autocapitalize="off"
+                    rows="7"></textarea>
+          <div class="box__foot">
+            <span class="box__count" id="inputCount">0 字符</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 操作区 -->
+      <section class="actionbar">
+        <button type="button" class="btn btn--primary btn--lg" id="activateBtn">
+          <span class="btn__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
+                 stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5Z" />
+            </svg>
+          </span>
+          <span class="btn__text">启动激活</span>
+          <kbd class="btn__kbd">Ctrl</kbd><kbd class="btn__kbd">↵</kbd>
+        </button>
+        <p class="actionbar__tip">解析结果将<strong>自动复制</strong>到剪贴板</p>
+      </section>
+
+      <!-- 输出区 -->
+      <section class="field">
+        <div class="field__head">
+          <label class="field__label" for="outputBox">
+            <span class="field__step">02</span>
+            <span class="field__name">激活结果</span>
+            <span class="badge badge--lock" title="该区域为只读，不可手动编辑">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none"
+                   stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                <rect x="4" y="10.5" width="16" height="10" rx="2.5" />
+                <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
+              </svg>
+              只读
+            </span>
+          </label>
+          <div class="field__tools">
+            <button type="button" class="btn btn--link" id="copyBtn" disabled>复制结果</button>
+          </div>
+        </div>
+
+        <div class="box box--output is-empty" id="outputWrap">
+          <textarea id="outputBox" class="box__area box__area--out"
+                    placeholder="激活结果会出现在这里……"
+                    readonly spellcheck="false" rows="7"
+                    aria-describedby="statusBar"></textarea>
+          <div class="box__foot">
+            <span class="box__hint" id="outputHint">等待激活</span>
+            <span class="box__count" id="outputCount">0 字符</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 状态条 -->
+      <div class="status status--idle" id="statusBar" role="status" aria-live="polite">
+        <span class="status__dot" aria-hidden="true"></span>
+        <span class="status__text" id="statusText">盒子已就绪，等待你的激活密钥。</span>
+      </div>
+
+    </main>
+
+    <footer class="foot">
+      <p class="foot__cn">© 激活盒子 · 保留所有权利</p>
+      <p class="foot__en" lang="en">© Activation Box · All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- 浮动提示 -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive">
+    <span class="toast__icon" id="toastIcon" aria-hidden="true">✓</span>
+    <span class="toast__text" id="toastText">已复制到剪贴板</span>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
